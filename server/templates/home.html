@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+
+<head></head>
+
+<body>
+    <h1>Great Videos Ranking</h1>
+    <ol>
+        {% for video in videos %}
+        <li>
+            <h2 style="margin: 50px 0 0;">{{ video.title }}</h2>
+            <object style="width: 400px; height: 260px; float: none; clear: both; margin: 2px auto;"
+                data="{{ video.url }}">
+            </object>
+            <h3>Likes: {{ video.likes }} - Dislikes {{ video.dislikes }}</h3>
+        </li>
+        {% endfor %}
+    </ol>
+</body>
