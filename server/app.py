@@ -1,8 +1,17 @@
-from flask import Flask, request, render_template
-
 from apps.videos import videos
+from apps.instrumentation import instrumentation
+from flask import Flask, request, render_template
+from time import time
+
+from opentelemetry.metrics import get_meter_provider
+
 
 app = Flask(__name__)
+
+default_meter = get_meter_provider().get_meter("default")
+meter_likes = default_meter.create_counter("video_likes", description="Calls to the Like Endpoint")
+meter_dislikes = default_meter.create_counter("video_dislikes", description="Calls to the Dislike Endpoint")
+meter_latency_get = default_meter.create_histogram("get_video_latency_seconds", unit="s", description="Latency of Video information retrieval")
 
 
 @app.get("/api/v1/video")
@@ -14,11 +23,28 @@ def get_videos():
 
 @app.get("/api/v1/video/<id>")
 def get_video_details(id):
-    return videos.get(id)  # Unhandled exception on purpose
+    start = time()
+    video = videos.get(id)
+    end = time()
+    meter_latency_get.record(
+        end - start,
+        {
+            "id": id,
+        },
+    )
+
+    return video
 
 
 @app.get("/api/v1/video/<id>/like")
 def like_video(id):
+    meter_likes.add(
+        1,
+        {
+            "user_ip": request.remote_addr,
+            "id": id,
+        },
+    )
     videos.like(id)
 
     return ("OK", 204)
@@ -26,6 +52,13 @@ def like_video(id):
 
 @app.get("/api/v1/video/<id>/dislike")
 def dislike_video(id):
+    meter_dislikes.add(
+        1,
+        {
+            "user_ip": request.remote_addr,
+            "id": id,
+        },
+    )
     videos.dislike(id)
 
     return ("OK", 204)
@@ -47,5 +80,5 @@ def index():
 
 
 if __name__ == "__main__":
-    # TODO: init Open Telemetry
+    instrumentation.init()
     app.run(host="0.0.0.0")
