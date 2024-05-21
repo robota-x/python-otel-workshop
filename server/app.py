@@ -11,7 +11,7 @@ app = Flask(__name__)
 default_meter = get_meter_provider().get_meter("default")
 meter_likes = default_meter.create_counter("video_likes", description="Calls to the Like Endpoint")
 meter_dislikes = default_meter.create_counter("video_dislikes", description="Calls to the Dislike Endpoint")
-meter_latency_get = default_meter.create_histogram("get_video_latency_seconds", unit="s", description="Latency of Video information retrieval")
+meter_latency_get = default_meter.create_histogram("get_video_latency_milliseconds", unit="ms", description="Latency of Video information retrieval")
 
 
 @app.get("/api/v1/video")
@@ -27,7 +27,7 @@ def get_video_details(id):
     video = videos.get(id)
     end = time()
     meter_latency_get.record(
-        end - start,
+        (end - start) * 1000,
         {
             "id": id,
         },
