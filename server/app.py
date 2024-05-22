@@ -21,14 +21,14 @@ def get_video_details(id):
 def like_video(id):
     videos.like(id)
 
-    return ("OK", 204)
+    return ("OK", 200)
 
 
 @app.get("/api/v1/video/<id>/dislike")
 def dislike_video(id):
     videos.dislike(id)
 
-    return ("OK", 204)
+    return ("OK", 200)
 
 
 @app.route("/")
