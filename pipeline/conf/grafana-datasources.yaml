@@ -1,0 +1,10 @@
+datasources:
+  - name: Prometheus
+    type: prometheus
+    uid: prometheus-1
+    url: http://prometheus:9090
+    access: server
+
+# deleteDatasources:
+#   - name: Prometheus
+#     uid: prometheus-1
