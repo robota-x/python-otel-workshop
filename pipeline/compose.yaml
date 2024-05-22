@@ -8,8 +8,6 @@ services:
       OTEL_EXPORTER_OTLP_ENDPOINT: otel-collector:4317
     ports:
       - "5000:5000"
-    restart: unless-stopped
-
 
   # OpenTelemetry Collector
   otel-collector:
@@ -25,3 +23,21 @@ services:
       - 4317:4317 # OTLP gRPC receiver
       - 4318:4318 # OTLP http receiver
     restart: unless-stopped
+
+ # Prometheus
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./conf/prometheus-config.yaml:/etc/prometheus/prometheus.yml
+    depends_on:
+      - otel-collector 
+    ports:
+      - "9090:9090"
+
+  # Grafana
+  grafana:
+    image: grafana/grafana:latest
+    volumes:
+      - ./conf/grafana-datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
+    ports:
+      - "3000:3000"
