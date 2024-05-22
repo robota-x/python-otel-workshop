@@ -41,13 +41,12 @@ def like_video(id):
     meter_likes.add(
         1,
         {
-            "user_ip": request.remote_addr,
             "id": id,
         },
     )
     videos.like(id)
 
-    return ("OK", 204)
+    return ("OK", 200)
 
 
 @app.get("/api/v1/video/<id>/dislike")
@@ -55,13 +54,12 @@ def dislike_video(id):
     meter_dislikes.add(
         1,
         {
-            "user_ip": request.remote_addr,
             "id": id,
         },
     )
     videos.dislike(id)
 
-    return ("OK", 204)
+    return ("OK", 200)
 
 
 @app.route("/")
